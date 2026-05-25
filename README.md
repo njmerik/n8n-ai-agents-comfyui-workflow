@@ -1,6 +1,6 @@
 # 🎬 AI Character Video Generator with Upscaling
 
-Автоматизированная система генерации высококачественных видео с вашим персонажем на основе текстового описания. Использует **n8n** для оркестрации, **ComfyUI** для генерации изображений с апскейлом и анимации.
+Автоматизированная система генерации  видео с вашим персонажем на основе текстового описания. Использует **n8n** для оркестрации, **ComfyUI** для генерации изображений с апскейлом и анимации.
 
 ## ✨ Возможности
 
@@ -94,127 +94,129 @@
                 │ FINAL VIDEO  │
                 └──────────────┘
 
-## 📦 Требования
+📦 Требования
+Обязательные компоненты
+Компонент	Назначение
+Docker	Запуск n8n
+n8n	Оркестрация workflow
+ComfyUI	Генерация изображений и видео
+Ollama	Бесплатная LLM (Llama)
 
-### Обязательные:
-- **Docker** с запущенным **n8n**
-- **ComfyUI** (локальная установка)
-- **Ollama** (для бесплатной модели Llama)
+Модели ComfyUI
 
-### Модели ComfyUI:
+Для генерации изображений:
 
-**Для генерации изображений:**
-- `flux1-dev-fp8.safetensors`
-- `uso-flux1-projector-v1.safetensors`
-- `uso-flux1-dit-lora-v1.safetensors`
-- `sigclip_vision_patch14_384.safetensors`
+    flux1-dev-fp8.safetensors
 
-**Для апскейла (Flux):**
-- `flux2/flux-2-klein-9b-fp8.safetensors`
-- `flux2/qwen_3_8b_fp8mixed.safetensors`
-- `flux2/flux2-vae.safetensors`
+    uso-flux1-projector-v1.safetensors
 
-**Для анимации видео:**
-- `wan_2.1_vae.safetensors`
-- `wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors`
-- `wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors`
-- `Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors`
-- `Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors`
-- `umt5_xxl_fp8_e4m3fn_scaled.safetensors`
+    uso-flux1-dit-lora-v1.safetensors
 
-### API ключи:
-- **OpenAI API Key** (для платной модели)
-- **Z-AI API Key** (альтернатива OpenAI)
+    sigclip_vision_patch14_384.safetensors
 
-## ⚙️ Установка
+Для апскейла (Flux):
 
-### 1. Настройка ComfyUI
+    flux2/flux-2-klein-9b-fp8.safetensors
 
-1. Установите [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
-2. Скачайте необходимые модели в папки:
-   - Checkpoints → `ComfyUI/models/checkpoints/`
-   - CLIP → `ComfyUI/models/clip/`
-   - VAE → `ComfyUI/models/vae/`
-   - UNET → `ComfyUI/models/unet/`
-   - LoRA → `ComfyUI/models/loras/`
+    flux2/qwen_3_8b_fp8mixed.safetensors
 
-3. Поместите ваш референс персонажа в `ComfyUI/input/girl_ref.png`
+    flux2/flux2-vae.safetensors
 
-4. Импортируйте workflow'ы в ComfyUI:
-   - Перетащите каждый JSON файл в интерфейс ComfyUI → Save
+Для анимации видео:
 
-### 2. Настройка n8n
+    wan_2.1_vae.safetensors
 
-1. **Установите n8n** (если еще нет):
-   ```bash
-   docker run -d --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n n8nio/n8n
+    wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors
 
-   Настройте credentials:
+    wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors
 
-    ComfyUI Account: URL http://host.docker.internal:8188 (или IP вашего компьютера)
-    OpenAI Account: Ваш API ключ
-    Ollama Account: URL http://host.docker.internal:11434
+    Wan2.2-Lightning_I2V-A14B-4steps-lora_HIGH_fp16.safetensors
 
-Установите Ollama и скачайте Llama:
+    Wan2.2-Lightning_I2V-A14B-4steps-lora_LOW_fp16.safetensors
+
+    umt5_xxl_fp8_e4m3fn_scaled.safetensors
+
+API ключи
+
+Ключ	Назначение
+OpenAI API Key	Платная модель (качественная)
+Z-AI API Key	Альтернатива OpenAI
+
+⚙️ Установка
+1. Настройка ComfyUI
+Шаг	   Действие
+1	    Установите ComfyUI
+2	    Скачайте модели в папки (см. список выше)
+3	    Поместите girl_ref.png в ComfyUI/input/
+4	    Импортируйте JSON workflow'ы в ComfyUI
+
+2. Настройка n8n
+
+Установка Docker:
+docker run -d --name n8n -p 5678:5678 -v n8n_data:/home/node/.n8n n8nio/n8n
+
+Настройка Credentials:
+Сервис	URL
+ComfyUI	http://host.docker.internal:8188
+Ollama	http://host.docker.internal:11434
+
+Установка Ollama:
 ollama pull llama3.1
 # или
 ollama pull phi4
-    Импортируйте workflow:
-        Откройте n8n → Workflows → Import from File
-        Выберите character-video-generator.json
 
-3. Настройка узлов
-AI Agent (платный)
+3. Настройка узлов n8n
+AI Agent (платный):
 
     Chat Model: OpenAI Chat Model / Z-AI
+
     System Message:
-   Ты помощник для генерации изображений. Пользователь пишет сцену на русском. 
+Ты помощник для генерации изображений. Пользователь пишет сцену на русском. 
 Твоя задача — перевести это в детальное описание сцены на английском языке 
 для генератора картинок. Описывай только действие и окружение, персонажа 
 описывать не нужно (он уже задан). Не пиши приветствий, отвечай только 
 описанием сцены.
-AI Agent1 (бесплатный)
+
+AI Agent1 (бесплатный):
 
     Chat Model: Ollama Chat Model (Llama/phi4)
+
     System Message: тот же текст
 
-IF Node
+IF Node:
+Поле	          Значение
+Condition	      String
+Value 1	       {{ $json.chatInput }}
+Operation	     Contains
+Value 2      	 #free
 
-    Condition: String
-    Value 1: {{ $json.chatInput }}
-    Operation: Contains
-    Value 2: #free
+Code Node:
 
-Code Node
 const workflow = { /* ваш JSON для генерации изображений */ };
-
 const agentText = $json.output || "";
 const finalPrompt = "A photorealistic young woman with light blonde hair, " + agentText;
-
 workflow["112:6"]["inputs"]["text"] = finalPrompt;
-
 return { json: { workflow: JSON.stringify(workflow), videoPrompt: finalPrompt } };
+
 📖 Использование
+
 Базовое использование
 
-    Откройте chat-интерфейс n8n
-    Напишите описание сцены:
-    девушка гуляет с собаками по городской улице
-    Нажмите Enter
-    Подождите 3-7 минут (включая апскейл и анимацию)
-    Получите готовое видео! 🎉
+Шаг	        Действие
+1	          Откройте chat-интерфейс n8n
+2	          Напишите описание сцены
+3	          Нажмите Enter
+4	          Подождите 3-7 минут
+5	          Получите готовое видео! 🎉
 
-Переключение моделей
-Бесплатная модель (Llama):
-девушка с зонтом под дождем #free
-Платная модель (качественнее):
-девушка гуляет в парке с собаками
 Примеры запросов
 
-    девушка в неоновом кафе
-    девушка за рулем машины
-    девушка читает книгу в библиотеке
-    девушка с цветами на улице #free
+Тип	                    Пример
+Платная модель	        девушка гуляет в парке с собаками
+Бесплатная модель	    девушка с зонтом под дождем #free
+Ночная сцена	        девушка в неоновом кафе
+Экшн	                девушка за рулем машины
+Спокойная	            девушка читает книгу в библиотеке
 
 🎛️ Настройки
 Параметры генерации изображений
